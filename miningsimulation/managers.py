@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict, deque
 from typing import NamedTuple
+from miningsimulation.logging import log_station_size
 from miningsimulation.station import UnloadStation
 from miningsimulation.truck import Truck
 
@@ -31,7 +32,7 @@ class MiningSitesManager(StateManager):
 
     def onboard_trucks(self, timestamp: int, trucks: list[Truck]) -> None:
         for truck in trucks:
-            time_truck_will_leave = timestamp + truck.mining_session_duration_minutes()
+            time_truck_will_leave = timestamp + truck.mining_session_duration_minutes(timestamp)
             self.trucks[time_truck_will_leave].append(truck)
 
     def remove_trucks(self, timestamp: int) -> list[Truck]:
@@ -93,6 +94,8 @@ class StationsManager(StateManager):
             next_station_i = self.unload_stations.index(min(self.unload_stations))
             self.unload_stations[next_station_i].enqueue((timestamp + self.unload_time_minutes, truck))
 
+        self._log_station_sizes(timestamp)
+
     def remove_trucks(self, timestamp: int) -> list[Truck]:
         trucks = []
         for unload_station in self.unload_stations:
@@ -106,6 +109,10 @@ class StationsManager(StateManager):
         for station in self.unload_stations:
             s += f"\n{station}"
         return s
+
+    def _log_station_sizes(self, timestamp) -> None:
+        for i in range(len(self.unload_stations)):
+            log_station_size(timestamp, self.unload_stations[i].id, len(self.unload_stations[i]))
 
 
 class Managers(NamedTuple):

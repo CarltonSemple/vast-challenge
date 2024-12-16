@@ -1,4 +1,5 @@
 from time import sleep
+from miningsimulation.logging import Logger
 from miningsimulation.managers import (
     Managers,
     MiningSitesManager,
@@ -15,9 +16,9 @@ class Simulation:
             run_duration_minutes: int,
             num_mining_trucks: int,
             num_unload_stations: int,
-            tick_interval: int=1,
+            tick_interval_minutes: int=1,
             sleep_seconds_between_ticks: int=0):
-        self.tick_interval = tick_interval
+        self.tick_interval = tick_interval_minutes
         self.run_duration = run_duration_minutes
         self.current_tick = 0
         self.start_timestamp = 0
@@ -40,12 +41,17 @@ class Simulation:
         self.managers.mining_sites.onboard_trucks(self.start_timestamp, trucks)
 
     def run_to_completion(self) -> None:
+        logger = Logger()
+        logger.run_logging_thread()
+
         self._generate_trucks_stations_managers()
 
         while (self.current_tick + self.start_timestamp < self.run_duration + self.start_timestamp):
-            print(f"tick: {self.current_tick + self.start_timestamp}")
+            print(f"minute: {self.current_tick + self.start_timestamp}")
             self.run_tick(self.current_tick + self.start_timestamp)
             self.current_tick += self.tick_interval
+
+        Logger.log_queue.put(None)
     
     def run_tick(self, timestamp: int) -> None:
         # unload stations queue -> route to mining sites
