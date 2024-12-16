@@ -5,17 +5,21 @@ waiting at mining sites is truck-dependent. unlimited mining sites.
 mining unload stations have 1 truck at a time. 5 minutes to unload.
 
 
+## Running
+Generate data with
+```
+python3 run_simulation.py
+```
+The `run_simulation.py` file can be used to modify runtime parameters.
+
+Analyze data with
+```
+python3 run_analysis.py
+```
+
 ## Architecture
 
 ### Simulation Data Generation
-
-#### Steps
-1. Generate n mining trucks
-2. Generate m unload stations
-3. Start all trucks at a mining site (unlimited mining sites, so set this to n mining sites if anything)
-4. Each of the m unload stations has a queue of trucks, and a wait time that can viewed
-5. The unload station with the shortest wait time has the next ready truck assigned to it
-6. Trucks move to a mining site as soon as they leave an unload station
 
 ### Main Components
 - Simulation management
